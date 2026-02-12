@@ -31,17 +31,33 @@ CANVA EDITOR                    CLOUDFLARE
 └─────────────────┘            └──────────────────────────┘
 ```
 
+## Status
+
+### Done
+- [x] Cloudflare Workers backend (Hono + R2 + D1) — deployed and live
+- [x] PDF viewer page at `/view/:slug` with PDF.js, send.co-style design
+- [x] Stats page at `/stats/:slug` with view count, unique IPs, timeline
+- [x] Canva Content Publisher app — settings UI, preview UI, publish flow
+- [x] Design Editor + Content Publisher intents registered
+- [x] Live at `https://send-canva-worker.brickstack.workers.dev`
+- [x] Canva app connected to Developer Portal (App ID: AAHAAMMv83Q)
+
+### Remaining
+- [ ] End-to-end test: publish from Canva Share menu → get link → view → check stats
+- [ ] Deploy Canva app bundle (`canva apps deploy`) for non-dev testing
+- [ ] Integrate with real send.co platform (replace POC backend)
+
 ## Tech Stack
 
 | Component | Technology |
 |-----------|-----------|
-| Canva App | React + TypeScript, Canva App UI Kit, `@canva/intents/content` |
+| Canva App | React + TypeScript, Canva App UI Kit, `@canva/intents/content` + `@canva/intents/design` |
 | Backend API | Cloudflare Workers (Hono framework) |
 | File Storage | Cloudflare R2 |
 | Database | Cloudflare D1 (SQLite) |
 | Viewer Page | Served from Workers (HTML + PDF.js from CDN) |
 | Stats Page | Served from Workers (HTML with view analytics) |
-| Deployment | Canva CLI (`canva apps deploy`) + Wrangler (`wrangler deploy`) |
+| Deployment | Canva CLI + Wrangler |
 
 ## Routes
 
@@ -52,3 +68,29 @@ CANVA EDITOR                    CLOUDFLARE
 | GET | `/api/file/:id` | Serve PDF from R2 |
 | GET | `/view/:slug` | Viewer page (public, for recipients) |
 | GET | `/stats/:slug` | Stats page (for sender, shows view analytics) |
+
+## Database Schema
+
+```sql
+documents: id, title, slug (unique), r2_key, allow_download, allow_print, created_at
+views: id, document_id (FK), viewed_at, ip_address, user_agent, referer
+```
+
+## Canva App Intents
+
+The app registers two intents:
+- **Design Editor** — required base intent for all Canva apps
+- **Content Publisher** — appears in the Share menu, handles the publish flow
+
+The Content Publisher exports designs as `pdf_standard` (letter size) and sends them to the Workers backend.
+
+## Key Learnings
+
+- All Canva apps need both `design_editor` and their specific intent (e.g. `content_publisher`) registered
+- `PublishContentResponse` error status must be `"app_error"` (with `message`) or `"remote_request_failed"` — not `"error"`
+- `PublishContentRequest` has no `title` field — only `publishRef`, `outputType`, `outputMedia`
+- Checkbox `onChange` in App UI Kit is `(value, checked)` — second arg is the boolean
+- Content Publisher intent is in preview status (APIs may change)
+- Canva CLI creates a nested `.git` — must remove before adding to parent repo
+- `canva-app.json` must declare both intents with `"enrolled": true`
+- Document export uses `accepts: { document: { format: "pdf_standard", size: "letter" } }`
