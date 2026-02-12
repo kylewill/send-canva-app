@@ -10,9 +10,6 @@
     ]
   },
   "intent": {
-    "design_editor": {
-      "enrolled": true
-    },
     "content_publisher": {
       "enrolled": true
     }
