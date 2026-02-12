@@ -545,20 +545,26 @@ function viewerHtml(
   }
 
   // Copy link button
+  const COPIED_OPACITY = '0.7';
+  const FEEDBACK_DURATION_MS = 2000;
+  
   document.getElementById('copyLinkBtn')?.addEventListener('click', async () => {
     const btn = document.getElementById('copyLinkBtn');
     const text = document.getElementById('copyLinkText');
+    
+    if (!btn || !text) return;
+    
     const currentUrl = window.location.href;
     
     try {
       await navigator.clipboard.writeText(currentUrl);
       text.textContent = 'Copied!';
-      btn.style.opacity = '0.7';
+      btn.style.opacity = COPIED_OPACITY;
       
       setTimeout(() => {
         text.textContent = 'Copy link';
         btn.style.opacity = '1';
-      }, 2000);
+      }, FEEDBACK_DURATION_MS);
     } catch (err) {
       console.error('Failed to copy:', err);
     }
