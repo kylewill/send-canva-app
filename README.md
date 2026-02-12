@@ -20,7 +20,7 @@ The Canva app flow is unchanged — settings UI, preview, publish button, PDF ex
 
 Instead of POSTing the PDF to the Cloudflare Worker, the Canva app POSTs it to send's API to get a real send URL. The one file that changes is `canva-app/src/intents/content_publisher/index.tsx` — swap the `WORKER_BASE_URL` and adjust the request/response shape to match send's API.
 
-### Auth strategy
+### Auth strategy ([detailed plan + progression → Issue #3](https://github.com/kylewill/send-canva-app/issues/3))
 
 Two options (not mutually exclusive):
 
