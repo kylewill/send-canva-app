@@ -545,8 +545,8 @@ function viewerHtml(
   }
 
   // Copy link button
-  const COPIED_OPACITY = '0.7';
-  const FEEDBACK_DURATION_MS = 2000;
+  const copiedOpacity = '0.7';
+  const feedbackDurationMs = 2000;
   
   document.getElementById('copyLinkBtn')?.addEventListener('click', async () => {
     const btn = document.getElementById('copyLinkBtn');
@@ -559,12 +559,12 @@ function viewerHtml(
     try {
       await navigator.clipboard.writeText(currentUrl);
       text.textContent = 'Copied!';
-      btn.style.opacity = COPIED_OPACITY;
+      btn.style.opacity = copiedOpacity;
       
       setTimeout(() => {
         text.textContent = 'Copy link';
         btn.style.opacity = '1';
-      }, FEEDBACK_DURATION_MS);
+      }, feedbackDurationMs);
     } catch (err) {
       console.error('Failed to copy:', err);
     }
