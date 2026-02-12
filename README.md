@@ -6,6 +6,41 @@ A POC Canva Content Publisher app that lets users create tracked document links 
 
 ---
 
+## How to Integrate with send.co
+
+1. Open this repo with Claude Code
+2. Tell it to review `CLAUDE.md` in this repo and the `CLAUDE.md` (or equivalent) in the send codebase
+3. Ask it to make a plan to integrate the Canva app with send
+
+### What stays the same
+
+The Canva app flow is unchanged — settings UI, preview, publish button, PDF export. Everything up to generating the link works exactly as the POC.
+
+### What changes
+
+Instead of POSTing the PDF to the Cloudflare Worker, the Canva app POSTs it to send's API to get a real send URL. The one file that changes is `canva-app/src/intents/content_publisher/index.tsx` — swap the `WORKER_BASE_URL` and adjust the request/response shape to match send's API.
+
+### Auth strategy
+
+Two options (not mutually exclusive):
+
+- **Option A: OAuth in Canva (optional)** — Use `auth.getCanvaUserToken()` from `@canva/user` to silently identify users. Send the JWT alongside the publish request. No login screen needed. See [Canva User Identity](#canva-user-identity-frictionless-auth) below.
+- **Option B: Auth when user opens the link** — The `externalUrl` in the publish response points to the send stats page. Handle sign-up/sign-in there. The Canva `userId` from the publish request can pre-associate the document so it's waiting when the user creates an account.
+
+Either way, the first publish should be **instant** — no sign-up gate.
+
+### Post-publish UX
+
+Canva controls the success dialog after publish. You cannot customize it. The only lever is `externalUrl` which Canva renders as a clickable button. The UX is:
+
+```
+Publish → Canva success dialog → user clicks button → send stats page → copy link
+```
+
+Build copy-link and share UX into the send stats/dashboard page, not inside Canva.
+
+---
+
 ## Table of Contents
 
 - [What This POC Proves](#what-this-poc-proves)
