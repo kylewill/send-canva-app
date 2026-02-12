@@ -54,9 +54,9 @@ async function getPublishConfiguration(): Promise<GetPublishConfigurationRespons
             displayName: "Document",
             fileCount: { exact: 1 },
             accepts: {
-              image: {
-                format: "png",
-                aspectRatio: { min: 0.5, max: 2 },
+              document: {
+                format: "pdf_standard",
+                size: "letter",
               },
             },
           },

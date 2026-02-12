@@ -109,11 +109,18 @@ const ImagePreview = ({
     );
   }
 
+  // Document previews come as kind: "document" with status: "thumbnail"
+  // Image previews come as kind: "image" with status: "ready"
   const preview = media.previews.find(
-    (p) => p.kind === "image" && p.status === "ready",
-  ) as (Preview & { kind: "image"; status: "ready"; url: string }) | undefined;
+    (p) =>
+      (p.kind === "image" && p.status === "ready") ||
+      (p.kind === "document" && p.status === "thumbnail"),
+  ) as (Preview & { url?: string; thumbnailUrl?: string }) | undefined;
 
-  if (!preview) {
+  const thumbnailUrl =
+    (preview as any)?.thumbnailUrl || (preview as any)?.url;
+
+  if (!thumbnailUrl) {
     return (
       <div className={styles.imagePlaceholder}>
         <Placeholder shape="rectangle" />
@@ -123,7 +130,7 @@ const ImagePreview = ({
 
   return (
     <div className={styles.image}>
-      <ImageCard alt="Document preview" thumbnailUrl={preview.url} />
+      <ImageCard alt="Document preview" thumbnailUrl={thumbnailUrl} />
     </div>
   );
 };
