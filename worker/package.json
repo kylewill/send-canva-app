@@ -1,0 +1,19 @@
+{
+  "name": "send-canva-worker",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "db:migrate": "wrangler d1 execute send-canva-db --local --file=src/db/schema.sql"
+  },
+  "dependencies": {
+    "hono": "^4.7.0",
+    "nanoid": "^5.1.0"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250109.0",
+    "wrangler": "^4.0.0",
+    "typescript": "^5.7.0"
+  }
+}
