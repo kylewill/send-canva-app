@@ -22,10 +22,32 @@ Instead of POSTing the PDF to the Cloudflare Worker, the Canva app POSTs it to s
 
 ### Auth strategy ([detailed plan + progression → Issue #3](https://github.com/kylewill/send-canva-app/issues/3))
 
+```
+                         IN CANVA                          ON SEND.CO
+                    ┌─────────────────┐              ┌──────────────────────┐
+                    │                 │              │                      │
+  User designs      │  Share → Send   │   publish    │  Stats page opens    │
+  in Canva ────────▶│  Set slug,      │─────────────▶│                      │
+                    │  permissions    │   PDF + id   │  New user?           │
+                    │                 │              │  └─ Sign up/in       │
+                    │  No login       │              │     Docs waiting     │
+                    │  required       │              │                      │
+                    │                 │              │  Returning user?     │
+                    │  (silent canva  │              │  └─ Docs auto-merge  │
+                    │   userId sent   │              │     into account     │
+                    │   behind the    │              │                      │
+                    │   scenes)       │              │  Already signed in?  │
+                    │                 │              │  └─ Doc just appears │
+                    └─────────────────┘              └──────────────────────┘
+
+                    Zero friction to publish.        Auth happens here,
+                    User never sees a login.         only when needed.
+```
+
 Two options (not mutually exclusive):
 
-- **Option A: OAuth in Canva (optional)** — Use `auth.getCanvaUserToken()` from `@canva/user` to silently identify users. Send the JWT alongside the publish request. No login screen needed. See [Canva User Identity](#canva-user-identity-frictionless-auth) below.
-- **Option B: Auth when user opens the link** — The `externalUrl` in the publish response points to the send stats page. Handle sign-up/sign-in there. The Canva `userId` from the publish request can pre-associate the document so it's waiting when the user creates an account.
+- **Option A: OAuth in Canva (later)** — Use `auth.getCanvaUserToken()` from `@canva/user` to silently identify users. Send the JWT alongside the publish request. No login screen needed. See [Canva User Identity](#canva-user-identity-frictionless-auth) below.
+- **Option B: Auth when user opens the link (start here)** — The `externalUrl` in the publish response points to the send stats page. Handle sign-up/sign-in there. The Canva `userId` from the publish request can pre-associate the document so it's waiting when the user creates an account.
 
 Either way, the first publish should be **instant** — no sign-up gate.
 
