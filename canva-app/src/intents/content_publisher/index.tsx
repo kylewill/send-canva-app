@@ -118,7 +118,11 @@ async function publishContent(
     return {
       status: "completed",
       externalId: result.id,
-      externalUrl: result.statsUrl,
+      externalUrl: result.viewUrl,
+      postPublishAction: {
+        type: "redirect",
+        url: result.viewUrl,
+      },
     };
   } catch {
     return {

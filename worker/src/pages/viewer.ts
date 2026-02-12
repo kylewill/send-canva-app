@@ -379,6 +379,10 @@ function viewerHtml(
       <span class="doc-title">${escHtml(doc.title)}</span>
     </div>
     <div class="topbar-right">
+      <button class="btn btn-primary" id="copyLinkBtn" title="Copy share link">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244"/></svg>
+        <span id="copyLinkText">Copy link</span>
+      </button>
       ${doc.allow_download ? `
       <button class="btn btn-ghost" id="downloadBtn" title="Download PDF">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
@@ -539,6 +543,26 @@ function viewerHtml(
       await renderPage(i);
     }
   }
+
+  // Copy link button
+  document.getElementById('copyLinkBtn')?.addEventListener('click', async () => {
+    const btn = document.getElementById('copyLinkBtn');
+    const text = document.getElementById('copyLinkText');
+    const currentUrl = window.location.href;
+    
+    try {
+      await navigator.clipboard.writeText(currentUrl);
+      text.textContent = 'Copied!';
+      btn.style.opacity = '0.7';
+      
+      setTimeout(() => {
+        text.textContent = 'Copy link';
+        btn.style.opacity = '1';
+      }, 2000);
+    } catch (err) {
+      console.error('Failed to copy:', err);
+    }
+  });
 
   ${doc.allow_download ? `
   document.getElementById('downloadBtn')?.addEventListener('click', () => {
