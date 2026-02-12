@@ -23,25 +23,18 @@ Instead of POSTing the PDF to the Cloudflare Worker, the Canva app POSTs it to s
 ### Auth strategy ([detailed plan + progression → Issue #3](https://github.com/kylewill/send-canva-app/issues/3))
 
 ```
-                         IN CANVA                          ON SEND.CO
-                    ┌─────────────────┐              ┌──────────────────────┐
-                    │                 │              │                      │
-  User designs      │  Share → Send   │   publish    │  Stats page opens    │
-  in Canva ────────▶│  Set slug,      │─────────────▶│                      │
-                    │  permissions    │   PDF + id   │  New user?           │
-                    │                 │              │  └─ Sign up/in       │
-                    │  No login       │              │     Docs waiting     │
-                    │  required       │              │                      │
-                    │                 │              │  Returning user?     │
-                    │  (silent canva  │              │  └─ Docs auto-merge  │
-                    │   userId sent   │              │     into account     │
-                    │   behind the    │              │                      │
-                    │   scenes)       │              │  Already signed in?  │
-                    │                 │              │  └─ Doc just appears │
-                    └─────────────────┘              └──────────────────────┘
-
-                    Zero friction to publish.        Auth happens here,
-                    User never sees a login.         only when needed.
+  IN CANVA                              ON SEND.CO (stats page opens)
+┌──────────────┐                       ┌──────────────────────────────────────┐
+│              │                       │                                      │
+│ Share → Send │    publish            │  Already signed in?                  │
+│ Set slug,    │────────────────────▶  │  └─ Doc appears in current org.      │
+│ permissions  │    PDF + canva id     │     (can move to another org later)  │
+│              │                       │                                      │
+│ No login.    │                       │  Not signed in / new user?           │
+│ No account.  │                       │  └─ Auth wall (sign up / sign in).   │
+│ Just publish.│                       │     On auth, merge ALL docs from     │
+│              │                       │     this canva id into their account. │
+└──────────────┘                       └──────────────────────────────────────┘
 ```
 
 Two options (not mutually exclusive):
