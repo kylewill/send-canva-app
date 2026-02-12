@@ -3,7 +3,7 @@ main = "src/index.ts"
 compatibility_date = "2025-01-01"
 
 [vars]
-BASE_URL = "https://send-canva-worker.YOUR_SUBDOMAIN.workers.dev"
+BASE_URL = "https://send-canva-worker.brickstack.workers.dev"
 
 [[r2_buckets]]
 binding = "BUCKET"
@@ -12,4 +12,4 @@ bucket_name = "send-canva-files"
 [[d1_databases]]
 binding = "DB"
 database_name = "send-canva-db"
-database_id = "LOCAL"
+database_id = "26ec631f-f1ad-4799-a646-1ddee5682eb5"

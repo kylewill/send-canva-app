@@ -15,7 +15,7 @@ import { SettingsUi } from "./settings_ui";
 import type { PublishSettings } from "./types";
 
 // TODO: Update this to your deployed Workers URL
-const WORKER_BASE_URL = "https://send-canva-worker.YOUR_SUBDOMAIN.workers.dev";
+const WORKER_BASE_URL = "https://send-canva-worker.brickstack.workers.dev";
 
 const intl = initIntl();
 
