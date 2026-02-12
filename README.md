@@ -102,7 +102,7 @@ The `PublishContentRequest` object contains:
 ### What You Return
 
 ```typescript
-// Success — Canva shows a "Published" confirmation
+// Success — Canva shows a "Published" confirmation with a button linking to externalUrl
 { status: "completed", externalId: "your-doc-id", externalUrl: "https://send.co/stats/slug" }
 
 // Failure options (only these two are valid):
@@ -111,6 +111,24 @@ The `PublishContentRequest` object contains:
 ```
 
 **Gotcha**: The error status is `"app_error"` (not `"error"`), and it requires a `message` field.
+
+### Post-Publish UX (Canva-Controlled)
+
+After `publishContent` returns `"completed"`, Canva shows its own success dialog. **You cannot customize this dialog** — no custom buttons, text, or layout. Your only lever is `externalUrl`, which Canva renders as a clickable button.
+
+There is a `postPublishAction: { type: "redirect", url: "..." }` field in the SDK types, but it is **not implemented yet** — no official docs, no working examples, and Canva's security model (iframe sandbox, `window.open` blocked) may prevent automatic redirects entirely.
+
+**The actual UX flow is:**
+
+```
+1. User clicks Publish → Canva exports PDF → app POSTs to backend
+2. Canva shows success dialog with button linking to externalUrl (stats page)
+3. User clicks the button → opens stats page in new tab
+4. Stats page has "Copy link" button for the /view/:slug URL
+5. User copies and shares the tracked link with recipients
+```
+
+Build your post-publish experience (copy link, share buttons, etc.) into the destination page, not inside Canva.
 
 ---
 
@@ -124,7 +142,7 @@ The `PublishContentRequest` object contains:
 | **Settings panel** | Full React UI inside Canva. Can use Canva's App UI Kit components (TextInput, Checkbox, Select, etc.) or custom UI. |
 | **Preview panel** | Shows a real-time preview that updates as settings change. Good for showing the final link URL. |
 | **Publish ref** | Arbitrary string (we use JSON) passed from settings UI → publish function. This is how settings survive between steps. |
-| **Post-publish redirect** | `externalUrl` in the response — Canva shows this as a link the user can click after publishing. |
+| **Post-publish link** | `externalUrl` in the response — Canva shows as a clickable button in the success dialog. No auto-redirect, no custom UI. Build your post-publish UX (copy link, share) into the destination page. |
 | **App UI Kit** | Canva's component library: buttons, inputs, checkboxes, rows, text, image cards, etc. Matches Canva's design language. |
 | **Design thumbnail** | Available in preview UI via `previewMedia`. Document previews have `kind: "document"` with `status: "thumbnail"`. |
 
