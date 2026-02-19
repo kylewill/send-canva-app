@@ -12,10 +12,8 @@ import { createRoot } from "react-dom/client";
 import "@canva/app-ui-kit/styles.css";
 import { PreviewUi } from "./preview_ui";
 import { SettingsUi } from "./settings_ui";
-import type { PublishSettings } from "./types";
 
-// TODO: Update this to your deployed Workers URL
-const WORKER_BASE_URL = "https://send-canva-worker.brickstack.workers.dev";
+const SEND_UPLOAD_URL = "https://www.send.co/api/uploads/ingest-from-url";
 
 const intl = initIntl();
 
@@ -69,11 +67,6 @@ async function getPublishConfiguration(): Promise<GetPublishConfigurationRespons
 async function publishContent(
   request: PublishContentRequest,
 ): Promise<PublishContentResponse> {
-  // Parse the settings from publishRef
-  const settings: PublishSettings = request.publishRef
-    ? JSON.parse(request.publishRef)
-    : { slug: "", allowDownload: false, allowPrint: false };
-
   // Get the exported media URL from Canva
   const mediaSlot = request.outputMedia?.find((m) => m.mediaSlotId === "media");
   const mediaFile = mediaSlot?.files?.[0];
@@ -85,20 +78,13 @@ async function publishContent(
     };
   }
 
-  // Use the slug as a title fallback, or "Untitled Document"
-  const title = settings.slug || "Untitled Document";
-
   try {
-    // Post to our Workers API
-    const response = await fetch(`${WORKER_BASE_URL}/api/publish`, {
+    const response = await fetch(SEND_UPLOAD_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         fileUrl: mediaFile.url,
-        title,
-        slug: settings.slug || undefined,
-        allowDownload: settings.allowDownload,
-        allowPrint: settings.allowPrint,
+        title: "Untitled Document",
       }),
     });
 
@@ -109,16 +95,15 @@ async function publishContent(
     }
 
     const result = await response.json() as {
-      id: string;
-      slug: string;
-      viewUrl: string;
-      statsUrl: string;
+      url: string;
+      shareId: string;
+      linkId: string;
     };
 
     return {
       status: "completed",
-      externalId: result.id,
-      externalUrl: result.statsUrl,
+      externalId: result.shareId,
+      externalUrl: result.url,
     };
   } catch {
     return {
