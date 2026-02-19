@@ -8,6 +8,7 @@ import type {
   RenderPreviewUiRequest,
   RenderSettingsUiRequest,
 } from "@canva/intents/content";
+import { auth } from "@canva/user";
 import { createRoot } from "react-dom/client";
 import "@canva/app-ui-kit/styles.css";
 import { PreviewUi } from "./preview_ui";
@@ -79,12 +80,14 @@ async function publishContent(
   }
 
   try {
+    const userToken = await auth.getCanvaUserToken();
+
     const response = await fetch(SEND_UPLOAD_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         fileUrl: mediaFile.url,
-        title: "Untitled Document",
+        canvaUserToken: userToken,
       }),
     });
 
